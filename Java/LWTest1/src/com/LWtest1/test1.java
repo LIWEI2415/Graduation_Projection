@@ -1,9 +1,7 @@
 package com.LWtest1;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,16 +13,19 @@ public class test1 {
     String usefulStart="DATA;";//有用的开始
     int lengthOfStart=7;//indexOf只能取到“D”的位置，要往后补位置
     String usefulEnd="ENDSEC;";//有用的结束
+    String jsonPath="D:\\a学习资料\\毕设\\demo\\JSON\\FirstJson.json";
     public static void main(String[] args){
 
         test1 test1=new test1();
-        test1.showParameters();
+        String string=test1.showParameters();
+        System.out.println(string);
+        test1.creatJSON();
     }
 
     /*
     读取wallRevit.ifc文件，加"\r\n"是为了每段自己换行
      */
-    public static String readFileContent(String fileName) {
+    private static String readFileContent(String fileName) {
         File file = new File(fileName);
         BufferedReader reader = null;
         StringBuilder sbf = new StringBuilder();
@@ -52,7 +53,7 @@ public class test1 {
     /*
     截取ifc文件中DATA到ENDSEC中的关键内容
      */
-    public String getUsefulFilePart(){
+    private String getUsefulFilePart(){
 
         String iniFile=readFileContent(fileURL);
         String ultimaFile;
@@ -63,9 +64,10 @@ public class test1 {
     }
 
     /*
-    为了得到想要的参数
+    为了得到想要的参数(json文件的内容）
      */
-    public void showParameters(){
+    private String showParameters(){
+        String jsonText=null;
         String ultimaFile=getUsefulFilePart();
         //使用HashMap存储，k为实体加编号，v为后面的参数
         Map<String, ArrayList<String>> map=new HashMap<>();
@@ -145,19 +147,17 @@ public class test1 {
             }
             map.put(s,list);
         }
-        for(Map.Entry<String,ArrayList<String>> entry:map.entrySet()){
-            System.out.println(entry.getKey());
-            System.out.println(entry.getValue());
-        }
+//        for(Map.Entry<String,ArrayList<String>> entry:map.entrySet()){
+//            System.out.println(entry.getKey());
+//            System.out.println(entry.getValue());
+//        }
         //处理墙的参数
         for(String key:map.keySet()){
             if(key.contains("IFCWALLSTANDARDCASE")){
                 ArrayList<String> value=map.get(key);
                 //target1表示墙的位置信息，target2表示墙的几何信息
                 String target1=value.get(5);
-                System.out.println(target1);
                 String target2=value.get(6);
-                System.out.println(target2);
                 String[] crudeV2 = target2.split(",");
                 String[] crudeV1 = target1.split(",");
                 ArrayList<String> parameter1=new ArrayList<>();
@@ -178,12 +178,6 @@ public class test1 {
                         parameter1.add(crudeV1[p]);
                     }
                 }
-                System.out.println("参考坐标系原点位置:"+parameter1.get(7));
-                System.out.println("参考坐标系Z轴方向:"+parameter1.get(8));
-                System.out.println("参考坐标系X轴方向:"+parameter1.get(9));
-                System.out.println("局部坐标系原点坐标:"+parameter1.get(10));
-                System.out.println("局部坐标系Z轴方向:"+parameter1.get(11));
-                System.out.println("局部坐标系X轴方向:"+parameter1.get(12));
                 boolean w=false;
                 for(int i2=0;i2<crudeV2.length;i2++){
                     if(crudeV2[i2].contains("AREA")){
@@ -205,20 +199,51 @@ public class test1 {
                         }
                     }
                 }
-                System.out.println(parameter2);
-                System.out.println("拉伸体底面图形名字:"+parameter2.get(0));
-                System.out.println("拉伸体底面图形原点坐标:"+parameter2.get(1));
-                System.out.println("拉伸体底面图形坐标系X轴方向:"+parameter2.get(2));
-                System.out.println("拉伸体底面图形长度:"+parameter2.get(3));
-                System.out.println("拉伸体底面图形宽度:"+parameter2.get(4));
-                System.out.println("拉伸体原点坐标:"+parameter2.get(5));
-                System.out.println("拉伸体Z轴方向:" +parameter2.get(6));
-                System.out.println("拉伸体X轴方向:"+parameter2.get(7));
-                System.out.println("拉伸体拉伸方向:"+parameter2.get(8));
-                System.out.println("拉伸体拉伸长度:"+parameter2.get(9).replace(")",""));
+                //json文件的内容
+                jsonText = "{" + "\n" +
+                    "\t" + "\"" + "参考坐标系原点位置" + "\"" + ":" + "\"" + parameter1.get(7) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "参考坐标系Z轴方向" + "\"" + ":" + "\"" + parameter1.get(8) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "参考坐标系X轴方向" + "\"" + ":" + "\"" + parameter1.get(9) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "局部坐标系原点坐标" + "\"" + ":" + "\"" + parameter1.get(10) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "局部坐标系Z轴方向" + "\"" + ":" + "\"" + parameter1.get(11) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "局部坐标系X轴方向" + "\"" + ":" + "\"" + parameter1.get(12) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体底面图形名字" + "\"" + ":" + "\"" + parameter2.get(0) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体底面图形原点坐标" + "\"" + ":" + "\"" + parameter2.get(1) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体底面图形坐标系X轴方向" + "\"" + ":" + "\"" + parameter2.get(2) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体底面图形长度" + "\"" + ":" + "\"" + parameter2.get(3) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体底面图形宽度" + "\"" + ":" + "\"" + parameter2.get(4) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体原点坐标" + "\"" + ":" + "\"" + parameter2.get(5) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体Z轴方向" + "\"" + ":" + "\"" + parameter2.get(6) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体X轴方向" + "\"" + ":" + "\"" + parameter2.get(7) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体拉伸方向" + "\"" + ":" + "\"" + parameter2.get(8) + "\"" + "," + "\n" +
+                    "\t" + "\"" + "拉伸体拉伸长度" + "\"" + ":" + "\"" + parameter2.get(9).replace(")", "") + "\"" + "\n" +
+                    "}";
             }
         }
+        return jsonText;
     }
-
+    /*
+    创建json文件
+    */
+    private void creatJSON(){
+        String content=showParameters();
+        try {
+            File file=new File(jsonPath);
+            if (!file.getParentFile().exists())
+            { // 如果父目录不存在，创建父目录
+                file.getParentFile().mkdirs();
+            }
+            if (file.exists()) { // 如果已存在,删除旧文件
+                file.delete();
+            }
+            file.createNewFile();
+            Writer writer=new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+            writer.write(content);
+            writer.flush();
+            writer.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
 
