@@ -13,9 +13,17 @@
     <script src="dat.gui.min.js"></script>
     <script src="stats.min.js"></script>
     <script src="OrbitControls.js"></script>
+    <script src="jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <script>
+    $.get(
+    "http://127.0.0.1:5500/FirstJson.json", 
+    function (data) {
+            //读进了data变量中
+            //接下来用到data的代码必须全部在此函数内部进行
+            console.log(data);
+    })
 
     var scene, camera, renderer, controls, points;
     var stats = initStats();
@@ -289,7 +297,6 @@
 
         console.log("three init send...");
     })();
-
 </script>
 </body>
 </html>
