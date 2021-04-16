@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class graduation_project {
-    String fileURL="D:\\a学习资料\\毕设\\demo\\Java\\LWTest1\\src\\com\\lw\\material\\wallRevit.ifc";//文件所在地
+    String fileURL="LWTest1\\src\\com\\lw\\material\\wallRevit.ifc";//文件所在地
     String usefulStart="DATA;";//有用的开始
     int lengthOfStart=7;//indexOf只能取到“D”的位置，要往后补位置
     String usefulEnd="ENDSEC;";//有用的结束
