@@ -166,10 +166,10 @@ public class show_door {
         //这个门中的表示点的数据从第七位开始，前面的要不是向量，要不是坐标原点
         for(int i=7;i<points.size();i++){
             if(i==points.size()-1){
-                add.append("\t" + "\"").append(points.get(i)).append("\"").append("\n");
+                add.append("\t").append("\"").append(i-7).append("\""+":"+"\"").append(points.get(i)).append("\"").append("\n");
                 break;
             }
-            add.append("\t" + "\"").append(points.get(i)).append("\"").append(",").append("\n");
+            add.append("\t").append("\"").append(i-7).append("\""+":"+"\"").append(points.get(i)).append("\"").append(",").append("\n");
         }
         jsonText="{"+"\n"+add+"}";
         return jsonText;
