@@ -14,7 +14,7 @@ public class show_wall {
     String usefulStart="DATA;";//有用的开始
     int lengthOfStart=7;//indexOf只能取到“D”的位置，要往后补位置
     String usefulEnd="ENDSEC;";//有用的结束
-    String jsonPath="D:\\a学习资料\\毕设\\demo\\html_json\\FirstJson.json";//存放json文件的绝对位置
+    String jsonPath="D:\\a学习资料\\毕设\\demo\\html_json\\wall.json";//存放json文件的绝对位置
 
     public static void main(String[] args){
 

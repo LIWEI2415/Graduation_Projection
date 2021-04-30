@@ -8,14 +8,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class show_door {
+public class show_window {
     final String fileURL="LWTest1\\src\\com\\lw\\material\\医院CT室2018.ifc";//文件所在相对位置
     final String usefulStart="DATA;";//有用的开始
     final int lengthOfStart=7;//indexOf只能取到“D”的位置，要往后补位置
     final String usefulEnd="ENDSEC;";//有用的结束
-    final String jsonPath="D:\\a学习资料\\毕设\\demo\\html_json\\door.json";//存放json文件的绝对位置
+    final String jsonPath="D:\\a学习资料\\毕设\\demo\\html_json\\window.json";//存放json文件的绝对位置
     public static void main(String[] args){
-        show_door project=new show_door();
+        show_window project=new show_window();
         String string=project.showParameters();
         System.out.println(string);
         project.creatJSON();
@@ -64,9 +64,12 @@ public class show_door {
     为了得到想要的参数(json文件的内容）
      */
     private String showParameters(){
-        String jsonText = null;
+        String jsonText;
         ArrayList<String> points3D=new ArrayList<>();//一切坐标
         ArrayList<String> vectors=new ArrayList<>();//一切向量
+        ArrayList<String> longs=new ArrayList<>();//一切拉伸长度
+        String a = null;
+        String b = null;
         String ultimaFile=getUsefulFilePart();
         //使用HashMap存储，k为实体加编号，v为后面的参数
         Map<String, ArrayList<String>> map=new HashMap<>();
@@ -107,7 +110,7 @@ public class show_door {
 
         //将V中的#+数字替换成对应的参数
         for(String s:map.keySet()){
-            if(s.contains("#268622")){//！！！这个判断方法在ifc文件中实体超过1000000时可能会出错，建议提取出数字部分用equals
+            if(s.contains("#228248")){//！！！这个判断方法在ifc文件中实体超过1000000时可能会出错，建议提取出数字部分用equals
                 //从key中得到value
                 ArrayList<String> list=map.get(s);
                 for(int n=0;n<list.size();){
@@ -152,6 +155,13 @@ public class show_door {
                                     if(key.contains("IFCDIRECTION")){//！！！这个方法在有共同前缀的时候会出错，最好能使用equals
                                         vectors.add(map.get(key).get(0));
                                     }
+                                    if(key.contains("IFCEXTRUDEDAREASOLID")){//！！！这个方法在有共同前缀的时候会出错，最好能使用equals
+                                        longs.add(map.get(key).get(3));
+                                    }
+                                    if(key.contains("IFCRECTANGLEPROFILEDEF")){//！！！这个方法在有共同前缀的时候会出错，最好能使用equals
+                                        a=map.get(key).get(3);
+                                        b=map.get(key).get(4);
+                                    }
                                     break;
                                 }
                             }
@@ -166,38 +176,59 @@ public class show_door {
 //            System.out.println(entry.getKey());
 //            System.out.println(entry.getValue());
 //        }
+
+//        for(String s1:points3D){
+//            System.out.println(s1);
+//        }
+//        System.out.println("");
+//        for(String s2:vectors){
+//            System.out.println(s2);
+//        }
+//        System.out.println("");
+//        for(String s3:longs){
+//            System.out.println(s3);
+//        }
+//        System.out.println("");
         jsonText="{" + "\n" +
                 "\t" + "\"" + "参考坐标系原点位置" + "\"" + ":" + "\"" + points3D.get(0) + "\"" + "," + "\n" +
-                "\t" + "\"" + "参考坐标系Z轴方向" + "\"" + ":" + "\"" + vectors.get(0) + "\"" + "," + "\n" +
-                "\t" + "\"" + "参考坐标系X轴方向" + "\"" + ":" + "\"" + vectors.get(1) + "\"" + "," + "\n" +
                 "\t" + "\"" + "局部坐标系原点坐标" + "\"" + ":" + "\"" + points3D.get(1) + "\"" + "," + "\n" +
-                "\t" + "\"" + "门原点坐标" + "\"" + ":" + "\"" + points3D.get(2) + "\"" + "," + "\n" +
-                "\t" + "\"" + "门Z轴方向" + "\"" + ":" + "\"" + vectors.get(2) + "\"" + "," + "\n" +
-                "\t" + "\"" + "门X轴方向" + "\"" + ":" + "\"" + vectors.get(3) + "\"" + "," + "\n" +
-                "\t" + "\"" + "面一" + "\"" + ":" + "["+"\"" + points3D.get(7) + "\"" + ","+
-                                                        "\"" + points3D.get(8) + "\"" + "," +
-                                                        "\"" + points3D.get(9) + "\"" + ","+
-                                                        "\"" + points3D.get(10) + "\"" + "]"+","+"\n" +
-                "\t" + "\"" + "面二" + "\"" + ":" + "["+"\"" + points3D.get(11) + "\"" + ","+
+                "\t" + "\"" + "窗体原点坐标" + "\"" + ":" + "\"" + points3D.get(2) + "\"" + "," + "\n" +
+                "\t" + "\"" + "窗体Z轴方向" + "\"" + ":" + "\"" + vectors.get(0) + "\"" + "," + "\n" +
+                "\t" + "\"" + "窗体X轴方向" + "\"" + ":" + "\"" + vectors.get(1) + "\"" + "," + "\n" +
+                "\t" + "\"" + "外圈一" + "\"" + ":" + "["+"\"" + points3D.get(11) + "\"" + ","+
                                                         "\"" + points3D.get(12) + "\"" + "," +
                                                         "\"" + points3D.get(13) + "\"" + ","+
                                                         "\"" + points3D.get(14) + "\"" + "]"+","+"\n" +
-                "\t" + "\"" + "面三" + "\"" + ":" + "["+"\"" + points3D.get(15) + "\"" + ","+
-                                                        "\"" + points3D.get(16) + "\"" + "," +
-                                                        "\"" + points3D.get(17) + "\"" + ","+
-                                                        "\"" + points3D.get(18) + "\"" + "]"+","+"\n" +
-                "\t" + "\"" + "面四" + "\"" + ":" + "["+"\"" + points3D.get(19) + "\"" + ","+
-                                                        "\"" + points3D.get(20) + "\"" + "," +
-                                                        "\"" + points3D.get(21) + "\"" + ","+
-                                                        "\"" + points3D.get(22) + "\"" + "]"+","+"\n" +
-                "\t" + "\"" + "面五" + "\"" + ":" + "["+"\"" + points3D.get(23) + "\"" + ","+
-                                                        "\"" + points3D.get(24) + "\"" + "," +
-                                                        "\"" + points3D.get(25) + "\"" + ","+
-                                                        "\"" + points3D.get(26) + "\"" + "]"+","+"\n" +
-                "\t" + "\"" + "面六" + "\"" + ":" + "["+"\"" + points3D.get(27) + "\"" + ","+
+                "\t" + "\"" + "内圈一" + "\"" + ":" + "["+"\"" + points3D.get(16) + "\"" + ","+
+                                                        "\"" + points3D.get(17) + "\"" + "," +
+                                                        "\"" + points3D.get(18) + "\"" + "," +
+                                                        "\"" + points3D.get(19) + "\"" + "]"+","+"\n" +
+                "\t" + "\"" + "圈一坐标" + "\"" + ":" + "\"" + points3D.get(6) + "\"" + "," + "\n" +
+                "\t" + "\"" + "圈一拉伸长度" + "\"" + ":" + "\"" + longs.get(0) + "\"" + "," + "\n" +
+                "\t" + "\"" + "外圈二" + "\"" + ":" + "["+"\"" + points3D.get(21) + "\"" + ","+
+                                                        "\"" + points3D.get(22) + "\"" + "," +
+                                                        "\"" + points3D.get(23) + "\"" + ","+
+                                                        "\"" + points3D.get(24) + "\"" + "]"+","+"\n" +
+                "\t" + "\"" + "内圈二" + "\"" + ":" + "["+"\"" + points3D.get(26) + "\"" + ","+
+                                                        "\"" + points3D.get(27) + "\"" + "," +
                                                         "\"" + points3D.get(28) + "\"" + "," +
-                                                        "\"" + points3D.get(29) + "\"" + ","+
-                                                        "\"" + points3D.get(30) + "\"" + "]"+"\n" +
+                                                        "\"" + points3D.get(29) + "\"" + "]"+","+"\n" +
+                "\t" + "\"" + "圈二坐标" + "\"" + ":" + "\"" + points3D.get(7) + "\"" + "," + "\n" +
+                "\t" + "\"" + "圈二拉伸长度" + "\"" + ":" + "\"" + longs.get(1) + "\"" + "," + "\n" +
+                "\t" + "\"" + "长方体长度" + "\"" + ":" + "\"" + a + "\"" + "," + "\n" +
+                "\t" + "\"" + "长方体宽度" + "\"" + ":" + "\"" + b + "\"" + "," + "\n" +
+                "\t" + "\"" + "长方体坐标" + "\"" + ":" + "\"" + points3D.get(8) + "\"" + "," + "\n" +
+                "\t" + "\"" + "长方体拉伸长度" + "\"" + ":" + "\"" + longs.get(2) + "\"" + "," + "\n" +
+                "\t" + "\"" + "外圈三" + "\"" + ":" + "["+"\"" + points3D.get(32) + "\"" + ","+
+                                                        "\"" + points3D.get(33) + "\"" + "," +
+                                                        "\"" + points3D.get(34) + "\"" + ","+
+                                                        "\"" + points3D.get(35) + "\"" + "]"+","+"\n" +
+                "\t" + "\"" + "内圈三" + "\"" + ":" + "["+"\"" + points3D.get(37) + "\"" + ","+
+                                                        "\"" + points3D.get(38) + "\"" + "," +
+                                                        "\"" + points3D.get(39) + "\"" + "," +
+                                                        "\"" + points3D.get(40) + "\"" + "]"+","+"\n" +
+                "\t" + "\"" + "圈三坐标" + "\"" + ":" + "\"" + points3D.get(9) + "\"" + "," + "\n" +
+                "\t" + "\"" + "圈三拉伸长度" + "\"" + ":" + "\"" + longs.get(3) + "\""  + "\n" +
                 "}";
         return jsonText;
     }
