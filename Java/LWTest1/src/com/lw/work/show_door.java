@@ -18,7 +18,7 @@ public class show_door {
         show_door project=new show_door();
         String string=project.showParameters();
         System.out.println(string);
-        project.creatJSON();
+        project.createJSON();
     }
     /*
     读取wallRevit.ifc文件，加"\r\n"是为了每段自己换行
@@ -204,7 +204,7 @@ public class show_door {
     /*
     创建json文件
     */
-    private void creatJSON(){
+    private void createJSON(){
         String content=showParameters();
         try {
             File file=new File(jsonPath);

@@ -21,7 +21,7 @@ public class show_wall {
         show_wall project=new show_wall();
         String string=project.showParameters();
         System.out.println(string);
-        project.creatJSON();
+        project.createJSON();
     }
 
     /*
@@ -228,7 +228,7 @@ public class show_wall {
     /*
     创建json文件
     */
-    private void creatJSON(){
+    private void createJSON(){
         String content=showParameters();
         try {
             File file=new File(jsonPath);
